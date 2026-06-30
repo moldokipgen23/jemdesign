@@ -1,4 +1,4 @@
-FROM php:8.3-fpm
+FROM php:8.4-fpm
 
 # Install system deps + nginx + supervisor
 RUN apt-get update && apt-get install -y \
@@ -16,9 +16,8 @@ WORKDIR /var/www
 # Copy all application files
 COPY . .
 
-# Remove lock file and install fresh to avoid platform mismatch
-RUN rm -f composer.lock \
-    && composer install --no-dev --prefer-dist --no-interaction --no-scripts
+# Install dependencies
+RUN composer install --no-dev --prefer-dist --no-interaction --no-scripts
 
 # Generate optimized autoloader
 RUN composer dump-autoload --optimize
