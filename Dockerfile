@@ -13,12 +13,12 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
-# Copy composer files first for layer caching
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
-
-# Copy application files
+# Copy all application files
 COPY . .
+
+# Remove lock file and install fresh to avoid platform mismatch
+RUN rm -f composer.lock \
+    && composer install --no-dev --prefer-dist --no-interaction --no-scripts
 
 # Generate optimized autoloader
 RUN composer dump-autoload --optimize
