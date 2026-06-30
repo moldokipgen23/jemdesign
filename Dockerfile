@@ -8,36 +8,31 @@ RUN apt-get update && apt-get install -y \
     && pecl install redis && docker-php-ext-enable redis \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Create supervisor log dir
+RUN mkdir -p /var/log/supervisor
+
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
-# Copy all application files
+# Copy application files
 COPY . .
 
 # Install dependencies
-RUN composer install --no-dev --prefer-dist --no-interaction --no-scripts
+RUN composer install --no-dev --prefer-dist --no-interaction --no-scripts \
+    && composer dump-autoload --optimize
 
-# Generate optimized autoloader
-RUN composer dump-autoload --optimize
-
-# Create required directories
+# Create required directories and fix permissions
 RUN mkdir -p storage/app/public storage/framework/cache/data storage/framework/sessions \
     storage/framework/views storage/logs bootstrap/cache \
     && chown -R www-data:www-data /var/www \
     && chmod -R 775 storage bootstrap/cache
 
-# Nginx config
+# Config files — COPY AFTER app files so they're not overwritten
 COPY docker/nginx.conf /etc/nginx/sites-available/default
-
-# PHP config
 COPY docker/php.ini /usr/local/etc/php/conf.d/app.ini
-
-# Supervisor config
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-# Entrypoint
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
