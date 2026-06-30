@@ -23,6 +23,10 @@ COPY . .
 # Generate optimized autoloader
 RUN composer dump-autoload --optimize
 
+# Create required directories
+RUN mkdir -p storage/app/public storage/framework/cache storage/framework/sessions \
+    storage/framework/views storage/logs bootstrap/cache
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage \
