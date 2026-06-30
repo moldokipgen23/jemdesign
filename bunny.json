@@ -1,0 +1,44 @@
+{
+  "$schema": "https://bunny.net/schemas/magic-containers/bunny.json",
+  "app": {
+    "name": "jem-designs-shop"
+  },
+  "containers": [
+    {
+      "name": "app",
+      "type": "app",
+      "registry": "github",
+      "image": "moldokipgen23/jemdesign",
+      "tag": "latest",
+      "ports": [
+        {
+          "container": 80,
+          "protocol": "http"
+        }
+      ],
+      "env": [
+        { "key": "APP_ENV", "value": "production" },
+        { "key": "APP_DEBUG", "value": "false" },
+        { "key": "DB_CONNECTION", "value": "mariadb" },
+        { "key": "DB_HOST", "value": "127.0.0.1" },
+        { "key": "DB_PORT", "value": "3306" },
+        { "key": "DB_DATABASE", "value": "laravel" },
+        { "key": "DB_USERNAME", "value": "laravel" },
+        { "key": "DB_PASSWORD", "value": "laravel" }
+      ],
+      "depends_on": ["db"]
+    },
+    {
+      "name": "db",
+      "type": "database",
+      "image": "mariadb:11",
+      "volumes": ["/var/lib/mysql"],
+      "env": [
+        { "key": "MARIADB_DATABASE", "value": "laravel" },
+        { "key": "MARIADB_USER", "value": "laravel" },
+        { "key": "MARIADB_PASSWORD", "value": "laravel" },
+        { "key": "MARIADB_ROOT_PASSWORD", "value": "root" }
+      ]
+    }
+  ]
+}
