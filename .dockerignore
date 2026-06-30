@@ -1,4 +1,5 @@
 node_modules
+vendor
 .git
 .gitignore
 .env
@@ -15,7 +16,6 @@ tests
 .idea
 .vscode
 .nova
-.vscode
 public/hot
 public/storage
 storage/*.key
