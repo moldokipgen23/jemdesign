@@ -41,11 +41,6 @@ else
     echo "==> Database already seeded ($HAS_USERS users)"
 fi
 
-# Warm caches
-php artisan config:cache 2>/dev/null || true
-php artisan route:cache  2>/dev/null || true
-php artisan view:cache   2>/dev/null || true
-
 # Fix storage permissions one more time
 chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
