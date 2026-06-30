@@ -3,7 +3,7 @@ FROM php:8.3-fpm
 # Install system deps + nginx + supervisor
 RUN apt-get update && apt-get install -y \
     nginx supervisor git curl zip unzip \
-    libpng-dev libonig-dev libxml2-dev libzip-dev libfcgi-bin \
+    libpng-dev libonig-dev libxml2-dev libzip-dev \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
     && pecl install redis && docker-php-ext-enable redis \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -15,7 +15,7 @@ WORKDIR /var/www
 
 # Copy composer files first for layer caching
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
 
 # Copy application files
 COPY . .
@@ -24,13 +24,10 @@ COPY . .
 RUN composer dump-autoload --optimize
 
 # Create required directories
-RUN mkdir -p storage/app/public storage/framework/cache storage/framework/sessions \
-    storage/framework/views storage/logs bootstrap/cache
-
-# Set permissions
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage \
-    && chmod -R 755 /var/www/bootstrap/cache
+RUN mkdir -p storage/app/public storage/framework/cache/data storage/framework/sessions \
+    storage/framework/views storage/logs bootstrap/cache \
+    && chown -R www-data:www-data /var/www \
+    && chmod -R 775 storage bootstrap/cache
 
 # Nginx config
 COPY docker/nginx.conf /etc/nginx/sites-available/default
