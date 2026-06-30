@@ -20,13 +20,14 @@ php artisan storage:link --force 2>/dev/null || true
 
 # Wait for MariaDB to be ready
 echo "Waiting for database..."
-until php artisan db:monitor --timeout=1 2>/dev/null; do
-    sleep 2
+for i in $(seq 1 30); do
+    if php artisan migrate --force 2>/dev/null; then
+        echo "Database is ready!"
+        break
+    fi
+    echo "Database not ready, retrying ($i/30)..."
+    sleep 3
 done
-echo "Database is ready!"
-
-# Run migrations
-php artisan migrate --force
 
 # Seed demo data if database is empty
 php artisan db:seed --force 2>/dev/null || true
