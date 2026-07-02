@@ -32,14 +32,9 @@ done
 echo "==> Running migrations..."
 php artisan migrate --force 2>&1 || echo "==> Migration warning (may already be up to date)"
 
-# Seed only if users table is empty
-HAS_USERS=$(mysql -h"${DB_HOST:-db}" -u"${DB_USERNAME:-laravel}" -p"${DB_PASSWORD:-laravel}" "${DB_DATABASE:-laravel}" -sse "SELECT COUNT(*) FROM users;" 2>/dev/null || echo "0")
-if [ "$HAS_USERS" = "0" ]; then
-    echo "==> Seeding database..."
-    php artisan db:seed --force 2>&1 || echo "==> Seed warning (non-fatal)"
-else
-    echo "==> Database already seeded ($HAS_USERS users)"
-fi
+# Always seed — seeder uses firstOrCreate so it's safe to run multiple times
+echo "==> Seeding database..."
+php artisan db:seed --force 2>&1 || echo "==> Seed warning (non-fatal)"
 
 # Fix storage permissions one more time
 chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache

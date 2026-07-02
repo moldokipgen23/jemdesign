@@ -15,10 +15,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'name'  => 'Jem Admin',
-            'email' => 'admin@jemdesigns.com',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@jemdesigns.com'],
+            [
+                'name'     => 'Jem Admin',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+            ]
+        );
 
         $this->call([
             CategorySeeder::class,
